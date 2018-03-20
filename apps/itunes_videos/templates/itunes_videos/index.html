@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>iTunes Artist Search</title>
+        <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+        {% load static %}
+        <script>
+            $(document).ready(function(){
+                $("form").submit(function(e){
+                    e.preventDefault()
+                    img_file = "{% static 'itunes_videos/img/loading_spinner.gif' %}";
+                    $("#video").html("<img src='" + img_file + "'>")
+                    $.ajax({
+                        url: $(this).attr("action"),
+                        data: $(this).serialize(),
+                        method: "post",
+                        success: function(res){
+                            if(res.results.length != 0) {
+                                html_string = "<video controls src='" + res.results[0].previewUrl + "'></video>";
+                            }
+                            else {
+                                html_string = "Not Found";
+                            }
+                            $("#video").html(html_string);
+                        }
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <h1>Enter Artist's Name:</h1>
+        <form action="search" method="POST">
+            {% csrf_token %}
+            <input type="text" name="artist">
+            <input type="submit" value="search">
+        </form>
+        <div id="video"></div>
+    </body>
+</html>
